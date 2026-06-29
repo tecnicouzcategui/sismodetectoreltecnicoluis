@@ -246,20 +246,8 @@ function App() {
   }
 
   return (
-    <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
-      <button 
-        className="mobile-menu-btn" 
-        onClick={() => setIsSidebarOpen(true)}
-        title="Abrir Menú"
-      >
-        <Menu size={24} /> <span style={{ marginLeft: '8px', fontWeight: 'bold' }}>SISMOS</span>
-      </button>
-      
-      {isSidebarOpen && (
-        <Sidebar earthquakes={earthquakes} onQuakeClick={handleQuakeClick} onClose={() => {
-          if (window.innerWidth <= 768) setIsSidebarOpen(false);
-        }} />
-      )}
+    <div className="app-container sidebar-open">
+      <Sidebar earthquakes={earthquakes} onQuakeClick={handleQuakeClick} onClose={() => {}} />
       <MapComponent earthquakes={earthquakes} onQuakeClick={handleQuakeClick} />
       
 

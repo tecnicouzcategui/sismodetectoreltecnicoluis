@@ -33,39 +33,28 @@ body {
   width: 100vw;
 }
 
-/* Sidebar Overlay (móvil por defecto) */
+/* Sidebar layout */
 .full-screen-sidebar {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 90vw;
-  max-width: 380px;
-  height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: rgba(15, 23, 42, 0.97);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  z-index: 3000;
-  display: flex;
-  flex-direction: column;
-  animation: slideInLeft 0.3s ease;
   border-right: 1px solid rgba(255,255,255,0.1);
   box-shadow: 4px 0 24px rgba(0,0,0,0.6);
+  z-index: 10;
 }
 
-@keyframes slideInLeft {
-  from { transform: translateX(-100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-/* Desktop: columna fija */
+/* Desktop: columna fija a la izquierda */
 @media (min-width: 769px) {
+  .app-container {
+    flex-direction: row;
+  }
   .full-screen-sidebar {
     position: relative;
     width: 360px;
     max-width: 360px;
-    animation: none;
-    z-index: 10;
+    height: 100vh;
     flex-shrink: 0;
   }
   .close-btn {
@@ -747,7 +736,7 @@ body {
    RESPONSIVE DESIGN (MOBILE)
    ======================== */
 .mobile-menu-btn {
-  display: none; /* Oculto en PC y Celulares por ahora */
+  display: none;
 }
 
 @media (max-width: 768px) {
@@ -756,17 +745,30 @@ body {
   }
   
   .map-container {
-    height: 100vh;
+    height: 50vh;
     width: 100vw;
-    flex: 1;
+    flex: none;
     order: 1;
   }
   
-  /* Resumen inferior derecho en móvil */
+  .full-screen-sidebar {
+    height: 50vh;
+    width: 100vw;
+    order: 2;
+    border-right: none;
+    border-top: 2px solid var(--accent-color);
+  }
+
+  .close-btn {
+    display: none !important;
+  }
+  
+  /* Mantener el resumen arriba a la izquierda, pero ajustar tamaño si es necesario */
   .summary-overlay {
-    bottom: 80px;
-    left: 20px;
-    padding: 10px 15px;
+    top: 10px;
+    left: 10px;
+    bottom: auto;
+    padding: 8px 12px;
   }
   
   .summary-count {
