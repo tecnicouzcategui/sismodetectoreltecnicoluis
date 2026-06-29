@@ -181,7 +181,8 @@ const MapComponent = ({ earthquakes }) => {
           const { id, properties, geometry } = quake;
           const [lng, lat] = geometry.coordinates;
           const mag = properties.mag;
-          const rank = index + 1;
+          // Orden cronológico: el más antiguo es el #1, el más reciente es el #N (longitud total)
+          const rank = earthquakes.length - index;
           return (
             <Marker
               key={id}
