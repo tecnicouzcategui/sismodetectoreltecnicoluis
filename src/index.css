@@ -487,16 +487,20 @@ body {
 }
 
 /* ========================
-   POPUP PERSONALIZADO
+   POPUP PERSONALIZADO (Integrado con Leaflet)
    ======================== */
-.custom-popup-overlay {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  z-index: 2000;
-  display: flex;
-  pointer-events: none;
-  animation: fadeIn 0.2s ease;
+.custom-leaflet-popup .leaflet-popup-content-wrapper {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 16px;
+}
+.custom-leaflet-popup .leaflet-popup-content {
+  margin: 0;
+  width: auto !important;
+}
+.custom-leaflet-popup .leaflet-popup-tip-container {
+  display: none; /* Hide default tip as our card has its own styling */
 }
 
 .custom-popup-card {

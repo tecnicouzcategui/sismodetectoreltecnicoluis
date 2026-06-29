@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, Marker, Tooltip, GeoJSON, TileLayer } from 'react-leaflet';
+import { MapContainer, Marker, Tooltip, GeoJSON, TileLayer, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { X, MapPin, Clock, ArrowDown, Activity, Map as MapIcon, Globe } from 'lucide-react';
 import { Geolocation } from '@capacitor/geolocation';
@@ -91,7 +91,6 @@ const getRegionInfo = (place) => {
 };
 
 const MapComponent = ({ earthquakes }) => {
-  const [selectedQuake, setSelectedQuake] = useState(null);
   const [venezuelaGeo, setVenezuelaGeo] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const [isSatellite, setIsSatellite] = useState(false);
@@ -205,84 +204,69 @@ const MapComponent = ({ earthquakes }) => {
           const { id, properties, geometry } = quake;
           const [lng, lat] = geometry.coordinates;
           const mag = properties.mag;
-          const rank = earthquakes.length - index;
+          const color = getMagColor(mag);
+          const label = getMagLabel(mag);
+          const time = new Date(properties.time);
+          const depth = geometry.coordinates[2];
+          
           return (
             <Marker
               key={id}
               position={[lat, lng]}
               icon={createPulseIcon(mag, rank)}
-              eventHandlers={{ 
-                click: () => setSelectedQuake(quake),
-                mouseover: () => setSelectedQuake(quake),
-                mouseout: () => setSelectedQuake(null)
-              }}
             >
               <Tooltip direction="top" offset={[0, -10]} opacity={1} className="quake-tooltip">
                 <strong>#{rank} · M {mag?.toFixed(1)}</strong> — {properties.place}
               </Tooltip>
+              
+              <Popup className="custom-leaflet-popup" closeButton={false}>
+                <div className="custom-popup-card" style={{ '--mag-color': color }}>
+                  <div className="popup-ring-deco" style={{ borderColor: color, boxShadow: `0 0 30px ${color}44` }}></div>
+                  <div className="popup-mag-hero">
+                    <div className="popup-mag-value" style={{ color, textShadow: `0 0 20px ${color}88` }}>
+                      M {mag?.toFixed(1)}
+                    </div>
+                    <div className="popup-mag-badge" style={{ background: `${color}22`, border: `1px solid ${color}`, color }}>
+                      {label}
+                    </div>
+                  </div>
+                  <div className="popup-divider" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }}></div>
+                  <div className="popup-details">
+                    <div className="popup-detail-row">
+                      <MapPin size={15} style={{ color, flexShrink: 0 }} />
+                      <span>{properties.place}</span>
+                    </div>
+                    <div className="popup-detail-row">
+                      <Clock size={15} style={{ color, flexShrink: 0 }} />
+                      <span>{time.toLocaleDateString('es-VE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    </div>
+                    <div className="popup-detail-row">
+                      <Activity size={15} style={{ color, flexShrink: 0 }} />
+                      <span>{time.toLocaleTimeString('es-VE')} <em style={{ color: 'var(--text-secondary)', fontSize: '0.8em' }}>(hora local)</em></span>
+                    </div>
+                    <div className="popup-detail-row">
+                      <ArrowDown size={15} style={{ color, flexShrink: 0 }} />
+                      <span>Profundidad: <strong style={{ color }}>{depth?.toFixed(1)} km</strong></span>
+                    </div>
+                    <div className="popup-detail-row" style={{ marginTop: '6px', background: 'rgba(255,255,255,0.06)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <MapIcon size={16} style={{ color, flexShrink: 0, marginTop: '2px' }} />
+                      <span style={{ fontStyle: 'italic', color: 'var(--text-secondary)' }}>{getRegionInfo(properties.place)}</span>
+                    </div>
+                  </div>
+                  <div className="popup-coords">
+                    <span>Lat: {lat.toFixed(4)}°</span>
+                    <span>·</span>
+                    <span>Lng: {lng.toFixed(4)}°</span>
+                  </div>
+                  <div className="popup-footer">
+                    Monitor Sismico @eltecnicoluis · Fuente: USGS
+                  </div>
+                </div>
+              </Popup>
             </Marker>
           );
         })}
       </MapContainer>
-
-      {/* Popups... */}
-      {selectedQuake && (() => {
-        const { properties, geometry } = selectedQuake;
-        const [lng, lat, depth] = geometry.coordinates;
-        const mag = properties.mag;
-        const color = getMagColor(mag);
-        const label = getMagLabel(mag);
-        const time = new Date(properties.time);
-        return (
-          <div className="custom-popup-overlay" onClick={() => setSelectedQuake(null)}>
-            <div className="custom-popup-card" style={{ '--mag-color': color }} onClick={e => e.stopPropagation()}>
-              <button className="popup-close" onClick={() => setSelectedQuake(null)}>
-                <X size={18} />
-              </button>
-              <div className="popup-ring-deco" style={{ borderColor: color, boxShadow: `0 0 30px ${color}44` }}></div>
-              <div className="popup-mag-hero">
-                <div className="popup-mag-value" style={{ color, textShadow: `0 0 20px ${color}88` }}>
-                  M {mag?.toFixed(1)}
-                </div>
-                <div className="popup-mag-badge" style={{ background: `${color}22`, border: `1px solid ${color}`, color }}>
-                  {label}
-                </div>
-              </div>
-              <div className="popup-divider" style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }}></div>
-              <div className="popup-details">
-                <div className="popup-detail-row">
-                  <MapPin size={15} style={{ color, flexShrink: 0 }} />
-                  <span>{properties.place}</span>
-                </div>
-                <div className="popup-detail-row">
-                  <Clock size={15} style={{ color, flexShrink: 0 }} />
-                  <span>{time.toLocaleDateString('es-VE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                </div>
-                <div className="popup-detail-row">
-                  <Activity size={15} style={{ color, flexShrink: 0 }} />
-                  <span>{time.toLocaleTimeString('es-VE')} <em style={{ color: 'var(--text-secondary)', fontSize: '0.8em' }}>(hora local)</em></span>
-                </div>
-                <div className="popup-detail-row">
-                  <ArrowDown size={15} style={{ color, flexShrink: 0 }} />
-                  <span>Profundidad: <strong style={{ color }}>{depth?.toFixed(1)} km</strong></span>
-                </div>
-                <div className="popup-detail-row" style={{ marginTop: '6px', background: 'rgba(255,255,255,0.06)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <MapIcon size={16} style={{ color, flexShrink: 0, marginTop: '2px' }} />
-                  <span style={{ fontStyle: 'italic', color: 'var(--text-secondary)' }}>{getRegionInfo(properties.place)}</span>
-                </div>
-              </div>
-              <div className="popup-coords">
-                <span>Lat: {lat.toFixed(4)}°</span>
-                <span>·</span>
-                <span>Lng: {lng.toFixed(4)}°</span>
-              </div>
-              <div className="popup-footer">
-                Monitor Sismico @eltecnicoluis · Fuente: USGS
-              </div>
-            </div>
-          </div>
-        );
-      })()}
 
       <div className="summary-overlay">
         <div className="summary-title">Sismos (+4.0)</div>
