@@ -1,7 +1,7 @@
 import React from 'react';
-import { Activity } from 'lucide-react';
+import { Activity, X } from 'lucide-react';
 
-const Sidebar = ({ earthquakes, onQuakeClick }) => {
+const Sidebar = ({ earthquakes, onQuakeClick, onClose }) => {
   
   const getMagColor = (mag) => {
     if (mag >= 5) return 'var(--mag-extreme)';
@@ -33,7 +33,10 @@ const Sidebar = ({ earthquakes, onQuakeClick }) => {
   };
 
   return (
-    <div className="sidebar">
+    <div className="full-screen-sidebar" onMouseLeave={onClose}>
+      <button className="close-btn" onClick={onClose} aria-label="Cerrar menú">
+        <X size={24} />
+      </button>
       <div className="sidebar-header">
         <Activity className="icon" size={24} />
         <h1>Monitor Sismico @eltecnicoluis</h1>

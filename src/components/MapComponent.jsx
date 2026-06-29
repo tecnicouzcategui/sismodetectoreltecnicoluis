@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Tooltip, GeoJSON, useMap } from 'react-leaflet';
+import { MapContainer, Marker, Tooltip, GeoJSON } from 'react-leaflet';
 import L from 'leaflet';
-import { X, MapPin, Clock, ArrowDown, Activity, Plus, Minus, Mountain, Satellite, Map as MapIcon } from 'lucide-react';
+import { X, MapPin, Clock, ArrowDown, Activity, Map as MapIcon } from 'lucide-react';
 import { Geolocation } from '@capacitor/geolocation';
 
-// mag: magnitud del sismo, rank: número de cuenta regresiva (1 = más reciente)
 const createPulseIcon = (mag, rank) => {
   let magClass = 'mag-2';
   if (mag >= 3 && mag < 4) magClass = 'mag-3';
@@ -37,60 +36,66 @@ const getMagLabel = (mag) => {
   return 'MICRO';
 };
 
-// Controles personalizados de Zoom y Capas
-const CustomMapControls = ({ mapStyle, setMapStyle }) => {
-  const map = useMap();
-  const [zoom, setZoom] = useState(map.getZoom());
+const CITIES = [
+  { name: 'Puerto Ayacucho', coords: [5.6667, -67.5833] },
+  { name: 'Barcelona', coords: [10.1333, -64.6833] },
+  { name: 'San Fernando', coords: [7.8833, -67.4667] },
+  { name: 'Maracay', coords: [10.2333, -67.5833] },
+  { name: 'Barinas', coords: [8.6333, -70.2833] },
+  { name: 'Ciudad Bolívar', coords: [8.1167, -63.5833] },
+  { name: 'Valencia', coords: [10.1620, -68.0077] },
+  { name: 'San Carlos', coords: [9.6667, -68.5833] },
+  { name: 'Tucupita', coords: [9.0667, -62.6500] },
+  { name: 'Coro', coords: [11.4167, -69.6667] },
+  { name: 'S.J. de los Morros', coords: [9.9167, -67.3667] },
+  { name: 'Barquisimeto', coords: [10.0678, -69.3470] },
+  { name: 'Mérida', coords: [8.5952, -71.1433] },
+  { name: 'Los Teques', coords: [10.3333, -67.0333] },
+  { name: 'Maturín', coords: [9.7500, -63.1833] },
+  { name: 'La Asunción', coords: [11.0333, -63.8667] },
+  { name: 'Guanare', coords: [9.0333, -69.7333] },
+  { name: 'Cumaná', coords: [10.4667, -64.1833] },
+  { name: 'San Cristóbal', coords: [7.7669, -72.2250] },
+  { name: 'Trujillo', coords: [9.3667, -70.4333] },
+  { name: 'La Guaira', coords: [10.6000, -66.9333] },
+  { name: 'San Felipe', coords: [10.3333, -68.7333] },
+  { name: 'Maracaibo', coords: [10.6427, -71.6125] },
+  { name: 'Caracas', coords: [10.4806, -66.9036] },
+  { name: 'Ciudad Guayana', coords: [8.3617, -62.6422] }
+];
 
-  useEffect(() => {
-    const onZoom = () => setZoom(map.getZoom());
-    map.on('zoom', onZoom);
-    return () => map.off('zoom', onZoom);
-  }, [map]);
+const REGION_INFO = {
+  'Caracas': 'Capital y principal centro político del país.',
+  'Zulia': 'Tierra del majestuoso relámpago del Catatumbo.',
+  'Maracaibo': 'Tierra del majestuoso relámpago del Catatumbo.',
+  'Mérida': 'Región andina con altas cumbres y nieve.',
+  'Táchira': 'Pujante estado andino fronterizo.',
+  'Lara': 'Capital musical de Venezuela.',
+  'Barquisimeto': 'Capital musical de Venezuela, cuna del cuatro.',
+  'Falcón': 'Médanos, historia colonial y playas increíbles.',
+  'Carabobo': 'Importante centro industrial e histórico.',
+  'Sucre': 'Costas orientales y sede del Parque Mochima.',
+  'Margarita': 'Isla turística por excelencia en el Caribe.',
+  'Bolívar': 'Escudo Guayanés, selva y riqueza mineral.',
+  'Amazonas': 'Extensa selva tropical y tepuyes milenarios.',
+  'Aragua': 'Costas hermosas y Valles floridos.',
+  'Anzoátegui': 'Gran puerto oriental y balnearios hermosos.'
+};
 
-  return (
-    <div className="custom-map-controls">
-      {/* Botones de Capas */}
-      <div className="layer-switcher">
-        <button className={mapStyle === 'base' ? 'active' : ''} onClick={() => setMapStyle('base')} title="Mapa Base">
-          <MapIcon size={18} />
-        </button>
-        <button className={mapStyle === 'satellite' ? 'active' : ''} onClick={() => setMapStyle('satellite')} title="Satélite">
-          <Satellite size={18} />
-        </button>
-        <button className={mapStyle === 'terrain' ? 'active' : ''} onClick={() => setMapStyle('terrain')} title="Relieve">
-          <Mountain size={18} />
-        </button>
-      </div>
-
-      {/* Control de Zoom de Precisión */}
-      <div className="zoom-slider-container">
-        <button onClick={() => map.setZoom(zoom + 0.5)}><Plus size={16} /></button>
-        <div className="slider-wrapper">
-          <input 
-            type="range" 
-            min="4" 
-            max="12" 
-            step="0.1" 
-            value={zoom} 
-            onChange={(e) => map.setZoom(parseFloat(e.target.value))}
-            className="vertical-slider"
-          />
-        </div>
-        <button onClick={() => map.setZoom(zoom - 0.5)}><Minus size={16} /></button>
-      </div>
-    </div>
-  );
+const getRegionInfo = (place) => {
+  if (!place) return 'Región bajo constante monitoreo sísmico.';
+  for (const [key, value] of Object.entries(REGION_INFO)) {
+    if (place.includes(key)) return value;
+  }
+  return 'Falla geológica monitoreada en la región.';
 };
 
 const MapComponent = ({ earthquakes }) => {
   const [selectedQuake, setSelectedQuake] = useState(null);
   const [venezuelaGeo, setVenezuelaGeo] = useState(null);
-  const [mapStyle, setMapStyle] = useState('base'); // base, satellite, terrain
   const [userLocation, setUserLocation] = useState(null);
   const center = [7.5, -66.5];
 
-  // Cargar GeoJSON
   useEffect(() => {
     fetch('https://raw.githubusercontent.com/apache/superset/master/superset-frontend/plugins/legacy-plugin-chart-country-map/src/countries/venezuela.geojson')
       .then(r => r.json())
@@ -98,7 +103,6 @@ const MapComponent = ({ earthquakes }) => {
       .catch(err => console.error('Error cargando GeoJSON de Venezuela:', err));
   }, []);
 
-  // Cargar ubicación del usuario (Capacitor Geolocation)
   useEffect(() => {
     const requestLocation = async () => {
       try {
@@ -107,32 +111,30 @@ const MapComponent = ({ earthquakes }) => {
           const request = await Geolocation.requestPermissions();
           if (request.location !== 'granted') return;
         }
-
-        const position = await Geolocation.getCurrentPosition({
-          enableHighAccuracy: true
-        });
-
+        const position = await Geolocation.getCurrentPosition({ enableHighAccuracy: true });
         setUserLocation([position.coords.latitude, position.coords.longitude]);
       } catch (err) {
         console.warn('Geolocalización no soportada o denegada:', err);
       }
     };
-
     requestLocation();
   }, []);
 
-  // Determinar la URL del mapa según el estilo seleccionado
-  let tileUrl = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
-  if (mapStyle === 'satellite') tileUrl = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
-  if (mapStyle === 'terrain') tileUrl = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}";
+  const onEachState = (feature, layer) => {
+    // Label for the state
+    if (feature.properties && feature.properties.NAME_1) {
+      layer.bindTooltip(
+        feature.properties.NAME_1.toUpperCase(), 
+        { permanent: true, direction: 'center', className: 'state-label-tooltip' }
+      );
+    }
+  };
 
-  // Ajustar la transparencia de Venezuela si no estamos en el mapa base para poder ver el satélite/relieve
   const venezuelaStyle = {
-    fillColor: '#001133',
-    fillOpacity: mapStyle === 'base' ? 0.85 : 0.15,
-    color: '#3b82f6',
-    weight: 1.2,
-    opacity: mapStyle === 'base' ? 0.8 : 0.6,
+    fillColor: '#1e293b',
+    fillOpacity: 0.95,
+    color: '#475569',
+    weight: 1.5,
   };
 
   return (
@@ -141,26 +143,33 @@ const MapComponent = ({ earthquakes }) => {
         center={center}
         zoom={6}
         zoomControl={false}
-        zoomSnap={0.1} // Permite zoom decimal ultra preciso
+        zoomSnap={0.1}
         zoomDelta={0.5}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '100%', width: '100%', background: '#aadaff' }} // Premium Dark Vector Look
       >
-        <CustomMapControls mapStyle={mapStyle} setMapStyle={setMapStyle} />
-
-        <TileLayer
-          url={tileUrl}
-          attribution='&copy; OpenStreetMap &copy; CARTO &copy; Esri'
-        />
-
         {venezuelaGeo && (
           <GeoJSON
             data={venezuelaGeo}
             style={venezuelaStyle}
-            interactive={false}
+            onEachFeature={onEachState}
           />
         )}
 
-        {/* Marcador del Usuario */}
+        {/* City Markers */}
+        {CITIES.map((city, idx) => (
+          <Marker 
+            key={idx} 
+            position={city.coords} 
+            interactive={false}
+            icon={L.divIcon({
+              className: 'city-marker',
+              html: `<div class="city-dot"></div><div class="city-name">${city.name}</div>`,
+              iconSize: [100, 20],
+              iconAnchor: [50, 10]
+            })} 
+          />
+        ))}
+
         {userLocation && (
           <Marker 
             position={userLocation}
@@ -171,9 +180,7 @@ const MapComponent = ({ earthquakes }) => {
               iconAnchor: [10, 10]
             })}
           >
-            <Tooltip permanent direction="top" offset={[0, -10]}>
-              Estás Aquí
-            </Tooltip>
+            <Tooltip permanent direction="top" offset={[0, -10]}>Estás Aquí</Tooltip>
           </Marker>
         )}
 
@@ -181,16 +188,19 @@ const MapComponent = ({ earthquakes }) => {
           const { id, properties, geometry } = quake;
           const [lng, lat] = geometry.coordinates;
           const mag = properties.mag;
-          // Orden cronológico: el más antiguo es el #1, el más reciente es el #N (longitud total)
           const rank = earthquakes.length - index;
           return (
             <Marker
               key={id}
               position={[lat, lng]}
               icon={createPulseIcon(mag, rank)}
-              eventHandlers={{ click: () => setSelectedQuake(quake) }}
+              eventHandlers={{ 
+                click: () => setSelectedQuake(quake),
+                mouseover: () => setSelectedQuake(quake),
+                mouseout: () => setSelectedQuake(null)
+              }}
             >
-              <Tooltip direction="top" offset={[0, -10]} opacity={1}>
+              <Tooltip direction="top" offset={[0, -10]} opacity={1} className="quake-tooltip">
                 <strong>#{rank} · M {mag?.toFixed(1)}</strong> — {properties.place}
               </Tooltip>
             </Marker>
@@ -198,7 +208,7 @@ const MapComponent = ({ earthquakes }) => {
         })}
       </MapContainer>
 
-      {/* Ventana emergente personalizada con glassmorphism */}
+      {/* Popups... */}
       {selectedQuake && (() => {
         const { properties, geometry } = selectedQuake;
         const [lng, lat, depth] = geometry.coordinates;
@@ -239,6 +249,10 @@ const MapComponent = ({ earthquakes }) => {
                   <ArrowDown size={15} style={{ color, flexShrink: 0 }} />
                   <span>Profundidad: <strong style={{ color }}>{depth?.toFixed(1)} km</strong></span>
                 </div>
+                <div className="popup-detail-row" style={{ marginTop: '6px', background: 'rgba(255,255,255,0.06)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <MapIcon size={16} style={{ color, flexShrink: 0, marginTop: '2px' }} />
+                  <span style={{ fontStyle: 'italic', color: 'var(--text-secondary)' }}>{getRegionInfo(properties.place)}</span>
+                </div>
               </div>
               <div className="popup-coords">
                 <span>Lat: {lat.toFixed(4)}°</span>
@@ -253,7 +267,6 @@ const MapComponent = ({ earthquakes }) => {
         );
       })()}
 
-      {/* Resumen Superior Derecho */}
       <div className="summary-overlay">
         <div className="summary-title">Sismos (+4.0)</div>
         <div className="summary-count">{earthquakes.length}</div>

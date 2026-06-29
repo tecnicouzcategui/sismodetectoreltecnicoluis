@@ -2,16 +2,25 @@ import React, { useState, useEffect, useRef } from 'react';
 import MapComponent from './components/MapComponent';
 import Sidebar from './components/Sidebar';
 import { fetchEarthquakes } from './services/seismicService';
+import { X, Menu } from 'lucide-react';
 
 function App() {
   const [earthquakes, setEarthquakes] = useState([]);
   const [selectedQuake, setSelectedQuake] = useState(null);
   const [alertQuake, setAlertQuake] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [appStarted, setAppStarted] = useState(false);
 
   // Variables para el sintetizador de la alarma
   const audioCtxRef = useRef(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) setIsSidebarOpen(true);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const osc1Ref = useRef(null);
   const osc2Ref = useRef(null);
   const masterGainRef = useRef(null);
@@ -240,15 +249,17 @@ function App() {
     <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
       <button 
         className="mobile-menu-btn" 
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        title="Menú"
+        onClick={() => setIsSidebarOpen(true)}
+        title="Abrir Menú"
       >
-        {isSidebarOpen ? '✕' : '☰'}
+        <Menu size={24} /> <span style={{ marginLeft: '8px', fontWeight: 'bold' }}>SISMOS</span>
       </button>
       
-      <div className={`sidebar-wrapper ${isSidebarOpen ? 'open' : ''}`}>
-        <Sidebar earthquakes={earthquakes} onQuakeClick={handleQuakeClick} />
-      </div>
+      {isSidebarOpen && (
+        <Sidebar earthquakes={earthquakes} onQuakeClick={handleQuakeClick} onClose={() => {
+          if (window.innerWidth <= 768) setIsSidebarOpen(false);
+        }} />
+      )}
       <MapComponent earthquakes={earthquakes} onQuakeClick={handleQuakeClick} />
       
 

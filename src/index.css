@@ -33,17 +33,66 @@ body {
   width: 100vw;
 }
 
-/* Sidebar Styles */
-.sidebar {
-  width: 350px;
-  background: var(--panel-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-right: 1px solid var(--border-color);
+/* Sidebar Overlay (móvil por defecto) */
+.full-screen-sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 90vw;
+  max-width: 380px;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 3000;
   display: flex;
   flex-direction: column;
-  z-index: 1000;
-  box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+  animation: slideInLeft 0.3s ease;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 4px 0 24px rgba(0,0,0,0.6);
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Desktop: columna fija */
+@media (min-width: 769px) {
+  .full-screen-sidebar {
+    position: relative;
+    width: 360px;
+    max-width: 360px;
+    animation: none;
+    z-index: 10;
+    flex-shrink: 0;
+  }
+  .close-btn {
+    display: none !important;
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 10;
+}
+.close-btn:hover {
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.1);
 }
 
 .sidebar-header {
@@ -69,6 +118,8 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 10px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .quake-list::-webkit-scrollbar {
@@ -140,7 +191,42 @@ body {
 .leaflet-container {
   width: 100%;
   height: 100%;
-  background: #aadaff !important; /* Mar azul claro */
+  background: #aadaff !important; /* Azul claro para el mar */
+}
+
+/* City & State Labels */
+.city-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.city-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(255,255,255,0.8);
+}
+.city-name {
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000;
+  margin-top: 4px;
+  white-space: nowrap;
+}
+.state-label-tooltip {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  pointer-events: none;
+}
+.state-label-tooltip::before {
+  display: none;
 }
 
 /* Custom Marker Pulse */
@@ -213,20 +299,27 @@ body {
    ======================== */
 .summary-overlay {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  background: rgba(15, 23, 42, 0.45); /* Ligeramente más opaco para dar base */
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  bottom: 20px;
+  left: 20px;
+  top: auto;
+  right: auto;
+  background: rgba(15, 23, 42, 0.7); 
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   padding: 16px 24px;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.25); /* Borde más definido */
+  border: 1px solid rgba(255,255,255,0.15); 
   border-top: 3px solid var(--accent-color);
   z-index: 1000;
   text-align: center;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
   pointer-events: none;
-  animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: slideUpSum 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideUpSum {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .summary-title {
@@ -348,13 +441,11 @@ body {
    ======================== */
 .custom-popup-overlay {
   position: absolute;
-  inset: 0;
+  bottom: 20px;
+  right: 20px;
   z-index: 2000;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(3px);
+  pointer-events: none;
   animation: fadeIn 0.2s ease;
 }
 
@@ -487,94 +578,7 @@ body {
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* ========================
-   CONTROLES DEL MAPA (CAPAS Y ZOOM)
-   ======================== */
-.custom-map-controls {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  pointer-events: auto;
-}
-
-.layer-switcher, .zoom-slider-container {
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-}
-
-.layer-switcher button, .zoom-slider-container button {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  padding: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.layer-switcher button:hover, .zoom-slider-container button:hover {
-  background: rgba(255,255,255,0.1);
-  color: var(--text-primary);
-}
-
-.layer-switcher button.active {
-  background: rgba(56, 189, 248, 0.2);
-  color: var(--accent-color);
-  border-left: 2px solid var(--accent-color);
-}
-
-.zoom-slider-container {
-  align-items: center;
-  padding: 5px 0;
-}
-
-.slider-wrapper {
-  height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 10px 0;
-}
-
-.vertical-slider {
-  -webkit-appearance: none;
-  width: 120px;
-  height: 4px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 2px;
-  transform: rotate(-90deg); /* Voltear para que sea vertical */
-  transform-origin: center;
-  outline: none;
-}
-
-.vertical-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--accent-color);
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
-  transition: transform 0.1s;
-}
-
-.vertical-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-}
+/* Removed custom map controls CSS */
 
 /* ========================
    GEOLOCALIZACIÓN DEL USUARIO (MARCADOR PULSANTE)
@@ -689,56 +693,14 @@ body {
    RESPONSIVE DESIGN (MOBILE)
    ======================== */
 .mobile-menu-btn {
-  display: none;
+  display: none; /* Oculto en PC y Celulares por ahora */
 }
 
 @media (max-width: 768px) {
   .app-container {
-    flex-direction: row;
+    flex-direction: column;
   }
   
-  .mobile-menu-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 2001;
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid var(--accent-color);
-    color: var(--text-primary);
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  }
-
-  .sidebar-wrapper {
-    position: fixed;
-    top: 0;
-    left: -100%;
-    width: 300px;
-    height: 100vh;
-    z-index: 2000;
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 4px 0 24px rgba(0,0,0,0.8);
-  }
-
-  .sidebar-wrapper.open {
-    left: 0;
-  }
-
-  .sidebar {
-    width: 100%;
-    height: 100%;
-    border-right: 1px solid var(--border-color);
-    border-top: none;
-  }
-
   .map-container {
     height: 100vh;
     width: 100vw;
@@ -746,13 +708,11 @@ body {
     order: 1;
   }
   
-  /* El resumen de sismos se mueve arriba a la izquierda junto a los controles */
+  /* Resumen inferior derecho en móvil */
   .summary-overlay {
-    top: 20px;
-    left: 70px;
-    right: auto;
+    bottom: 80px;
+    left: 20px;
     padding: 10px 15px;
-    background: rgba(15, 23, 42, 0.7);
   }
   
   .summary-count {
@@ -760,12 +720,7 @@ body {
   }
   
   .summary-title {
-    font-size: 0.6rem;
-  }
-  
-  .custom-map-controls {
-    top: 20px;
-    left: 10px;
+    font-size: 0.7rem;
   }
   
   .global-alert-box {
