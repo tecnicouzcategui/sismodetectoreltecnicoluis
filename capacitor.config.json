@@ -1,8 +1,9 @@
 {
-  "appId": "com.sismodetector.eltecnicoluis",
-  "appName": "Sismo Detector",
+  "appId": "com.sismoalerta.eltecnicoluis",
+  "appName": "Sismo Alerta",
   "webDir": "dist",
   "server": {
     "androidScheme": "https"
   }
 }
+

@@ -1,7 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Sismo Detector</string>
-    <string name="title_activity_main">Sismo Detector</string>
-    <string name="package_name">com.sismodetector.eltecnicoluis</string>
-    <string name="custom_url_scheme">com.sismodetector.eltecnicoluis</string>
+    <string name="app_name">Sismo Alerta</string>
+    <string name="title_activity_main">Sismo Alerta</string>
+    <string name="package_name">com.sismoalerta.eltecnicoluis</string>
+    <string name="custom_url_scheme">com.sismoalerta.eltecnicoluis</string>
 </resources>
+
