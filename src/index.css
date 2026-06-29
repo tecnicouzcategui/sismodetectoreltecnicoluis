@@ -24,7 +24,9 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-primary);
-  overflow: hidden;
+  overflow: hidden; /* desktop: no scroll */
+  height: 100%;
+  width: 100%;
 }
 
 .app-container {
@@ -106,9 +108,11 @@ body {
 .quake-list {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 10px;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .quake-list::-webkit-scrollbar {
@@ -742,28 +746,51 @@ body {
 @media (max-width: 768px) {
   .app-container {
     flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+  
+  body {
+    overflow: hidden;
   }
   
   .map-container {
     height: 50vh;
+    min-height: 50vh;
+    max-height: 50vh;
     width: 100vw;
     flex: none;
     order: 1;
+    overflow: hidden;
   }
   
   .full-screen-sidebar {
     height: 50vh;
+    min-height: 50vh;
+    max-height: 50vh;
     width: 100vw;
     order: 2;
     border-right: none;
     border-top: 2px solid var(--accent-color);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .quake-list {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
   }
 
   .close-btn {
     display: none !important;
   }
   
-  /* Mantener el resumen arriba a la izquierda, pero ajustar tamaño si es necesario */
+  /* Resumen arriba a la izquierda en móvil */
   .summary-overlay {
     top: 10px;
     left: 10px;
@@ -772,11 +799,11 @@ body {
   }
   
   .summary-count {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
   
   .summary-title {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
   }
   
   .global-alert-box {

@@ -33,7 +33,7 @@ const Sidebar = ({ earthquakes, onQuakeClick, onClose }) => {
   };
 
   return (
-    <div className="full-screen-sidebar" onMouseLeave={onClose}>
+    <div className="full-screen-sidebar">
       <button className="close-btn" onClick={onClose} aria-label="Cerrar menú">
         <X size={24} />
       </button>
