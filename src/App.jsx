@@ -7,6 +7,7 @@ function App() {
   const [earthquakes, setEarthquakes] = useState([]);
   const [selectedQuake, setSelectedQuake] = useState(null);
   const [alertQuake, setAlertQuake] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // 1. Cargar datos históricos iniciales (REST API)
   const loadHistoricalData = async () => {
@@ -113,11 +114,24 @@ function App() {
 
   const handleQuakeClick = (quake) => {
     setSelectedQuake(quake);
+    if (window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    }
   };
 
   return (
-    <div className="app-container">
-      <Sidebar earthquakes={earthquakes} onQuakeClick={handleQuakeClick} />
+    <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+      <button 
+        className="mobile-menu-btn" 
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        title="Menú"
+      >
+        {isSidebarOpen ? '✕' : '☰'}
+      </button>
+      
+      <div className={`sidebar-wrapper ${isSidebarOpen ? 'open' : ''}`}>
+        <Sidebar earthquakes={earthquakes} onQuakeClick={handleQuakeClick} />
+      </div>
       <MapComponent earthquakes={earthquakes} onQuakeClick={handleQuakeClick} />
       
       {/* Ventana emergente de Alerta Global */}
