@@ -142,10 +142,10 @@ const MapComponent = ({ earthquakes }) => {
       <button 
         className={`satellite-toggle-btn ${isSatellite ? 'active' : ''}`}
         onClick={() => setIsSatellite(!isSatellite)}
-        title="Alternar Vista Satelital"
+        title={isSatellite ? "Cambiar a Mapa Simple" : "Alternar Vista Satelital"}
       >
-        <Globe size={20} />
-        <span>Satelital</span>
+        {isSatellite ? <MapIcon size={20} /> : <Globe size={20} />}
+        <span>{isSatellite ? 'Mapa Simple' : 'Satelital'}</span>
       </button>
 
       <MapContainer
