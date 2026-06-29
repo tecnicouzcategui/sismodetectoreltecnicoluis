@@ -145,7 +145,7 @@ const MapComponent = ({ earthquakes }) => {
         title={isSatellite ? "Cambiar a Mapa Simple" : "Alternar Vista Satelital"}
       >
         {isSatellite ? <MapIcon size={20} /> : <Globe size={20} />}
-        <span>{isSatellite ? 'Mapa Simple' : 'Satelital'}</span>
+        <span>{isSatellite ? 'Ver Mapa Simple' : 'Ver en Satelital'}</span>
       </button>
 
       <MapContainer
