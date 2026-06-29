@@ -289,10 +289,6 @@ const MapComponent = ({ earthquakes }) => {
         <div className="summary-count">{earthquakes.length}</div>
         <div className="summary-subtitle">desde el 24 de Jun. 2026</div>
       </div>
-
-      <div className="map-overlay">
-        Últimos 30 días · Solo M4.0+ · @eltecnicoluis
-      </div>
     </div>
   );
 };
