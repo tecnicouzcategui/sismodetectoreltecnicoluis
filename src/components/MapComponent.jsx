@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, Marker, Tooltip, GeoJSON } from 'react-leaflet';
+import { MapContainer, Marker, Tooltip, GeoJSON, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
-import { X, MapPin, Clock, ArrowDown, Activity, Map as MapIcon } from 'lucide-react';
+import { X, MapPin, Clock, ArrowDown, Activity, Map as MapIcon, Globe } from 'lucide-react';
 import { Geolocation } from '@capacitor/geolocation';
 
 const createPulseIcon = (mag, rank) => {
@@ -94,6 +94,7 @@ const MapComponent = ({ earthquakes }) => {
   const [selectedQuake, setSelectedQuake] = useState(null);
   const [venezuelaGeo, setVenezuelaGeo] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
+  const [isSatellite, setIsSatellite] = useState(false);
   const center = [7.5, -66.5];
 
   useEffect(() => {
@@ -131,22 +132,38 @@ const MapComponent = ({ earthquakes }) => {
   };
 
   const venezuelaStyle = {
-    fillColor: '#1e293b',
-    fillOpacity: 0.95,
-    color: '#475569',
-    weight: 1.5,
+    fillColor: isSatellite ? 'transparent' : '#1e293b',
+    fillOpacity: isSatellite ? 0 : 0.95,
+    color: isSatellite ? '#38bdf8' : '#475569',
+    weight: isSatellite ? 2 : 1.5,
   };
 
   return (
     <div className="map-container">
+      <button 
+        className={`satellite-toggle-btn ${isSatellite ? 'active' : ''}`}
+        onClick={() => setIsSatellite(!isSatellite)}
+        title="Alternar Vista Satelital"
+      >
+        <Globe size={20} />
+        <span>Satelital</span>
+      </button>
+
       <MapContainer
         center={center}
         zoom={6}
         zoomControl={false}
         zoomSnap={0.1}
         zoomDelta={0.5}
-        style={{ height: '100%', width: '100%', background: '#aadaff' }} // Premium Dark Vector Look
+        style={{ height: '100%', width: '100%', background: isSatellite ? '#020617' : '#aadaff' }} 
       >
+        {isSatellite && (
+          <TileLayer
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            attribution="Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community"
+          />
+        )}
+        
         {venezuelaGeo && (
           <GeoJSON
             data={venezuelaGeo}
