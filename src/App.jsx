@@ -251,13 +251,7 @@ function App() {
       </div>
       <MapComponent earthquakes={earthquakes} onQuakeClick={handleQuakeClick} />
       
-      {/* Botón flotante para pruebas en localhost */}
-      <button 
-        onClick={simulateAlert}
-        style={{ position: 'absolute', bottom: '30px', left: '30px', zIndex: 9999, background: '#dc2626', color: 'white', padding: '12px 20px', borderRadius: '8px', border: '2px solid white', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
-      >
-        🚨 Simular Alarma
-      </button>
+
 
       {/* Ventana emergente de Alerta Global */}
       {alertQuake && (
