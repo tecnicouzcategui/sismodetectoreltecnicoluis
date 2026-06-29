@@ -349,9 +349,9 @@ body {
 
 .summary-overlay {
   position: absolute;
-  bottom: 20px;
+  bottom: auto;
   left: 20px;
-  top: auto;
+  top: 20px;
   right: auto;
   background: rgba(15, 23, 42, 0.7); 
   backdrop-filter: blur(8px);

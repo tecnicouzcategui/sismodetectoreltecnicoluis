@@ -208,6 +208,7 @@ const MapComponent = ({ earthquakes }) => {
           const label = getMagLabel(mag);
           const time = new Date(properties.time);
           const depth = geometry.coordinates[2];
+          const rank = earthquakes.length - index;
           
           return (
             <Marker
