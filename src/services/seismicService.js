@@ -5,8 +5,10 @@ export const fetchEarthquakes = async () => {
   const minLng = -73.5;
   const maxLng = -59.5;
   
-  // Fecha del terremoto: 24 de junio de 2026
-  const startTime = '2026-06-24T00:00:00Z';
+  // Calcular 30 días atrás desde la fecha actual
+  const d = new Date();
+  d.setDate(d.getDate() - 30);
+  const startTime = d.toISOString();
   
   // Pedimos desde 4.0 para el conteo y las alertas
   const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minlatitude=${minLat}&maxlatitude=${maxLat}&minlongitude=${minLng}&maxlongitude=${maxLng}&starttime=${startTime}&minmagnitude=4.0&orderby=time&limit=500`;
