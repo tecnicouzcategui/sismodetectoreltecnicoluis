@@ -4,6 +4,18 @@ import Sidebar from './components/Sidebar';
 import { fetchEarthquakes } from './services/seismicService';
 import { X, Menu } from 'lucide-react';
 
+// Función para calcular distancia en km entre dos coordenadas (Haversine)
+const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // Radio de la Tierra en km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+};
+
 function App() {
   const [earthquakes, setEarthquakes] = useState([]);
   const [selectedQuake, setSelectedQuake] = useState(null);
@@ -24,6 +36,26 @@ function App() {
   const osc1Ref = useRef(null);
   const osc2Ref = useRef(null);
   const masterGainRef = useRef(null);
+  const userLocationRef = useRef(null);
+
+  // Obtener ubicación en tiempo real del usuario
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      const watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          userLocationRef.current = {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude
+          };
+        },
+        (error) => {
+          console.warn('Error obteniendo ubicación GPS:', error);
+        },
+        { enableHighAccuracy: true, maximumAge: 60000, timeout: 10000 }
+      );
+      return () => navigator.geolocation.clearWatch(watchId);
+    }
+  }, []);
 
   // 1. Cargar datos históricos iniciales (REST API)
   const loadHistoricalData = async () => {
@@ -115,7 +147,16 @@ function App() {
               region.toLowerCase().includes('venezuela') ||
               place.toLowerCase().includes('venezuela');
 
-            if (isVenezuela && mag >= 4.0) {
+            // Verificar si está a menos de 300km del usuario
+            let within300km = false;
+            if (userLocationRef.current) {
+              const distance = calculateDistance(lat, lon, userLocationRef.current.lat, userLocationRef.current.lon);
+              if (distance <= 300) {
+                within300km = true;
+              }
+            }
+
+            if ((isVenezuela || within300km) && mag >= 4.0) {
               // Formatear al estándar compatible
               const formattedQuake = {
                 id: quake.id,
