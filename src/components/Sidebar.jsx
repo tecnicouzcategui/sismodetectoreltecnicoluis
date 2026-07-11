@@ -44,7 +44,7 @@ const Sidebar = ({ earthquakes, onQuakeClick, onClose }) => {
           onClick={() => window.triggerTestQuake && window.triggerTestQuake()} 
           style={{background:'#444', color:'white', fontSize:'10px', padding:'2px 5px', borderRadius:'4px', marginLeft:'10px'}}
         >
-          Prueba
+          Prueba CCS
         </button>
       </div>
       <div className="quake-list">

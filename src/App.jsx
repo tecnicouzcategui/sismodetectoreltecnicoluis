@@ -142,10 +142,10 @@ function App() {
   // 2. Escuchar sismos en tiempo real por WebSockets (EMSC)
   useEffect(() => {
     window.triggerTestQuake = () => {
-      const mag = 3.6;
-      const place = 'Maracaibo, Zulia (PRUEBA)';
-      const lat = 10.6427;
-      const lon = -71.6406;
+      const mag = 4.5;
+      const place = 'Caracas, Distrito Capital (PRUEBA ALARMA)';
+      const lat = 10.4806;
+      const lon = -66.9036;
       const formattedQuake = {
         id: 'test-' + Date.now(),
         type: 'Feature',
