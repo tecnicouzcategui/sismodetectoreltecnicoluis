@@ -156,7 +156,7 @@ function App() {
               }
             }
 
-            if ((isVenezuela || within300km) && mag >= 4.0) {
+            if ((isVenezuela || within300km) && mag >= 3.6) {
               // Formatear al estándar compatible
               const formattedQuake = {
                 id: quake.id,

@@ -270,7 +270,7 @@ const MapComponent = ({ earthquakes }) => {
       </MapContainer>
 
       <div className="summary-overlay">
-        <div className="summary-title">Sismos (+4.0)</div>
+        <div className="summary-title">Sismos (+3.6)</div>
         <div className="summary-count">{earthquakes.length}</div>
         <div className="summary-subtitle">Últimos 30 días</div>
       </div>

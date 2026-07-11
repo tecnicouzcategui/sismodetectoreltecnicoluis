@@ -10,8 +10,8 @@ export const fetchEarthquakes = async () => {
   d.setDate(d.getDate() - 30);
   const startTime = d.toISOString();
   
-  // Pedimos desde 4.0 para el conteo y las alertas
-  const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minlatitude=${minLat}&maxlatitude=${maxLat}&minlongitude=${minLng}&maxlongitude=${maxLng}&starttime=${startTime}&minmagnitude=4.0&orderby=time&limit=500`;
+  // Pedimos desde 3.6 para el conteo y las alertas
+  const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&minlatitude=${minLat}&maxlatitude=${maxLat}&minlongitude=${minLng}&maxlongitude=${maxLng}&starttime=${startTime}&minmagnitude=3.6&orderby=time&limit=500`;
 
   try {
     const response = await fetch(url);
