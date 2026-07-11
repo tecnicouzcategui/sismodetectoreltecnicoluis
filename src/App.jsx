@@ -116,6 +116,23 @@ function App() {
   };
 
   useEffect(() => {
+    // Activar modo segundo plano si estamos en Capacitor/Cordova
+    if (window.cordova && window.cordova.plugins && window.cordova.plugins.backgroundMode) {
+      window.cordova.plugins.backgroundMode.enable();
+      window.cordova.plugins.backgroundMode.on('activate', () => {
+         window.cordova.plugins.backgroundMode.disableWebViewOptimizations();
+      });
+      window.cordova.plugins.backgroundMode.setDefaults({
+          title: 'SismoDetector Activo',
+          text: 'Escuchando sismos en segundo plano',
+          icon: 'icon', 
+          color: 'F14E4E', 
+          resume: true,
+          hidden: false,
+          bigText: true
+      });
+    }
+
     loadHistoricalData();
     // Polling de respaldo cada 5 minutos
     const interval = setInterval(loadHistoricalData, 300000);
