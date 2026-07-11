@@ -141,6 +141,45 @@ function App() {
 
   // 2. Escuchar sismos en tiempo real por WebSockets (EMSC)
   useEffect(() => {
+    window.triggerTestQuake = () => {
+      const mag = 3.6;
+      const place = 'Maracaibo, Zulia (PRUEBA)';
+      const lat = 10.6427;
+      const lon = -71.6406;
+      const formattedQuake = {
+        id: 'test-' + Date.now(),
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [lon, lat, 10] },
+        properties: { mag, place, time: Date.now(), url: '' }
+      };
+
+      const p = place.toLowerCase();
+      const capitalKeywords = ['caracas', 'miranda', 'guaira', 'vargas', 'teques', 'guarenas', 'guatire', 'catia', 'maiquetia', 'caraballeda', 'naiguata', 'macuto', 'cua', 'charallave', 'petare', 'chacao', 'baruta', 'hatillo'];
+      const hasKeyword = capitalKeywords.some(k => p.includes(k));
+      const distToCaracas = calculateDistance(lat, lon, 10.4806, -66.9036);
+      const isCapitalRegion = hasKeyword || distToCaracas <= 120;
+
+      if (isCapitalRegion) {
+        setAlertQuake(formattedQuake);
+        playTerrifyingAlarm();
+        if (navigator.vibrate) navigator.vibrate([500, 250, 500, 250, 1000]);
+      }
+      
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(isCapitalRegion ? '⚠️ ALERTA SÍSMICA CAPITAL ⚠️' : 'Información Sísmica', {
+          body: `M ${mag.toFixed(1)} - ${place}`,
+          icon: '/icon.png',
+          requireInteraction: isCapitalRegion,
+          silent: !isCapitalRegion
+        });
+      }
+      
+      setEarthquakes(prev => [formattedQuake, ...prev]);
+    };
+  }, []);
+
+  // 2. Escuchar sismos en tiempo real por WebSockets (EMSC)
+  useEffect(() => {
     let socket;
     let reconnectTimeout;
 

@@ -40,6 +40,12 @@ const Sidebar = ({ earthquakes, onQuakeClick, onClose }) => {
       <div className="sidebar-header">
         <Activity className="icon" size={24} />
         <h1>Monitor Sismico @eltecnicoluis</h1>
+        <button 
+          onClick={() => window.triggerTestQuake && window.triggerTestQuake()} 
+          style={{background:'#444', color:'white', fontSize:'10px', padding:'2px 5px', borderRadius:'4px', marginLeft:'10px'}}
+        >
+          Prueba
+        </button>
       </div>
       <div className="quake-list">
         {earthquakes.length === 0 ? (
