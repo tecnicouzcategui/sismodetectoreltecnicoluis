@@ -173,24 +173,29 @@ function App() {
                 }
               };
 
-              // Lanzar Alerta Global
-              setAlertQuake(formattedQuake);
+              // Check if it's in the Capital Region (Caracas, La Guaira, Miranda)
+              const p = place.toLowerCase();
+              const capitalKeywords = ['caracas', 'miranda', 'guaira', 'vargas', 'teques', 'guarenas', 'guatire', 'catia', 'maiquetia', 'caraballeda', 'naiguata', 'macuto', 'cua', 'charallave', 'petare', 'chacao', 'baruta', 'hatillo'];
+              const hasKeyword = capitalKeywords.some(k => p.includes(k));
+              const distToCaracas = calculateDistance(lat, lon, 10.4806, -66.9036);
+              const isCapitalRegion = hasKeyword || distToCaracas <= 120;
 
-              // Reproducir Sonido de Alarma Terrorífica
-              playTerrifyingAlarm();
-
-              // Vibración en el teléfono (Vibrate API)
-              if (navigator.vibrate) {
-                // Patrón: Vibra 500ms, descansa 250ms, vibra 500ms, descansa 250ms, vibra 1s
-                navigator.vibrate([500, 250, 500, 250, 1000]);
+              if (isCapitalRegion) {
+                // Lanzar Alerta Global Fuerte
+                setAlertQuake(formattedQuake);
+                playTerrifyingAlarm();
+                if (navigator.vibrate) {
+                  navigator.vibrate([500, 250, 500, 250, 1000]);
+                }
               }
 
               // Notificación de sistema (Navegadores y PWA)
               if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('⚠️ ALERTA SÍSMICA ⚠️', {
+                new Notification(isCapitalRegion ? '⚠️ ALERTA SÍSMICA CAPITAL ⚠️' : 'Información Sísmica', {
                   body: `M ${mag.toFixed(1)} - ${place}`,
                   icon: '/icon.png',
-                  requireInteraction: true
+                  requireInteraction: isCapitalRegion,
+                  silent: !isCapitalRegion
                 });
               }
 
